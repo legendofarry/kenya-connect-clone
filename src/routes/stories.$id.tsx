@@ -3,7 +3,7 @@ import { queryOptions, useMutation, useQueryClient, useSuspenseQuery } from "@ta
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { ArrowBigUp, Flag, MapPin, Users } from "lucide-react";
-import { toast } from "sonner";
+import { notify as toast } from "@/lib/notifications-store";
 import { getStory } from "@/lib/public.functions";
 import { addComment, castVote, submitReport } from "@/lib/actions.functions";
 import { formatDate, reasonTone } from "@/components/site/story-card";

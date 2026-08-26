@@ -1,9 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Building2, Flame, Home, LogOut, PenLine, Search, Trophy, Wallet } from "lucide-react";
+import { Bell, Building2, Flame, Home, LogOut, PenLine, Search, Trophy, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { SplashScreen } from "@/components/site/splash-screen";
 import { RouteProgress } from "@/components/site/route-progress";
+import { NotificationBanners } from "@/components/site/notification-banners";
+import { useUnreadCount } from "@/lib/notifications-store";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -19,11 +21,13 @@ const nav = [
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const unread = useUnreadCount();
 
   return (
     <div className="min-h-screen bg-background">
       <SplashScreen />
       <RouteProgress />
+      <NotificationBanners />
       <header className="sticky top-0 z-40 border-b border-border glass-card">
 
         <div className="app-shell flex h-16 items-center gap-3">
@@ -48,6 +52,21 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            <Link
+              to="/notifications"
+              aria-label="Notifications"
+              className={cn(
+                "relative inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+                pathname === "/notifications" && "bg-secondary text-foreground",
+              )}
+            >
+              <Bell className="size-4" />
+              {unread > 0 ? (
+                <span className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              ) : null}
+            </Link>
             <ThemeToggle />
             <Button asChild size="sm" className="glow-primary">
               <Link to="/post">
