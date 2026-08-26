@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { notify as toast } from "@/lib/notifications-store";
 import { Loader2, Wallet } from "lucide-react";
 import { getSalaryAggregates } from "@/lib/public.functions";
 import { submitSalary } from "@/lib/actions.functions";

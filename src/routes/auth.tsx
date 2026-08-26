@@ -9,7 +9,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { toast } from "sonner";
+import { notify as toast } from "@/lib/notifications-store";
 import { EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { firebaseAuth } from "@/integrations/firebase/client";
 import { Button } from "@/components/ui/button";

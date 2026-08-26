@@ -3,7 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AlertTriangle, ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
-import { toast } from "sonner";
+import { notify as toast } from "@/lib/notifications-store";
 import { getFilterOptions } from "@/lib/public.functions";
 import { createStory, ensureProfile, findOrCreateCompany } from "@/lib/actions.functions";
 import { useAuth } from "@/hooks/useAuth";

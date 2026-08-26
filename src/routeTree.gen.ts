@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RightsRouteImport } from './routes/rights'
@@ -51,6 +52,11 @@ const GuidelinesRoute = GuidelinesRouteImport.update({
 const LeaderboardsRoute = LeaderboardsRouteImport.update({
   id: '/leaderboards',
   path: '/leaderboards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostRoute = PostRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/guidelines': typeof GuidelinesRoute
   '/leaderboards': typeof LeaderboardsRoute
+  '/notifications': typeof NotificationsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/rights': typeof RightsRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/guidelines': typeof GuidelinesRoute
   '/leaderboards': typeof LeaderboardsRoute
+  '/notifications': typeof NotificationsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/rights': typeof RightsRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/guidelines': typeof GuidelinesRoute
   '/leaderboards': typeof LeaderboardsRoute
+  '/notifications': typeof NotificationsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/rights': typeof RightsRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/guidelines'
     | '/leaderboards'
+    | '/notifications'
     | '/post'
     | '/privacy'
     | '/rights'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/guidelines'
     | '/leaderboards'
+    | '/notifications'
     | '/post'
     | '/privacy'
     | '/rights'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/guidelines'
     | '/leaderboards'
+    | '/notifications'
     | '/post'
     | '/privacy'
     | '/rights'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LeaderboardsRoute: typeof LeaderboardsRoute
+  NotificationsRoute: typeof NotificationsRoute
   PostRoute: typeof PostRoute
   PrivacyRoute: typeof PrivacyRoute
   RightsRoute: typeof RightsRoute
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboards'
       fullPath: '/leaderboards'
       preLoaderRoute: typeof LeaderboardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post': {
@@ -401,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   GuidelinesRoute: GuidelinesRoute,
   LeaderboardsRoute: LeaderboardsRoute,
+  NotificationsRoute: NotificationsRoute,
   PostRoute: PostRoute,
   PrivacyRoute: PrivacyRoute,
   RightsRoute: RightsRoute,
