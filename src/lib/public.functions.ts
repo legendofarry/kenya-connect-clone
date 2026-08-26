@@ -30,6 +30,7 @@ export const listStories = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => FeedInput.parse(input ?? {}))
   .handler(async ({ data }) => {
     try {
+      console.log("[listStories] Fetching stories with params:", data);
       const stories = await getPublicStories({
         sort: data.sort,
         industry: data.industry,
@@ -38,8 +39,10 @@ export const listStories = createServerFn({ method: "GET" })
         companySlug: data.companySlug,
         limit: data.limit,
       });
+      console.log("[listStories] Success, returned", stories.length, "stories");
       return { stories, error: null as string | null };
     } catch (error) {
+      console.error("[listStories] Full error:", error);
       if (!isFirebaseReadUnavailable(error)) throw error;
       console.warn("[listStories] Firebase public read unavailable", error);
       return { stories: [], error: "Firebase is not ready yet." };
@@ -48,8 +51,16 @@ export const listStories = createServerFn({ method: "GET" })
 
 export const getFilterOptions = createServerFn({ method: "GET" }).handler(async () => {
   try {
-    return await getFilterOptionsData();
+    console.log("[getFilterOptions] Fetching filter options");
+    const result = await getFilterOptionsData();
+    console.log("[getFilterOptions] Success:", {
+      companies: result.companies.length,
+      industries: result.industries.length,
+      counties: result.counties.length,
+    });
+    return result;
   } catch (error) {
+    console.error("[getFilterOptions] Full error:", error);
     if (!isFirebaseReadUnavailable(error)) throw error;
     console.warn("[getFilterOptions] Firebase public read unavailable", error);
     return { companies: [], industries: [], counties: [] };
