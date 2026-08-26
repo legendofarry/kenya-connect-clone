@@ -1,12 +1,21 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  deleteUser,
+  getAdditionalUserInfo,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
 import { toast } from "sonner";
 import { EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { firebaseAuth } from "@/integrations/firebase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -54,6 +63,40 @@ function AuthPage() {
       setBusy(false);
     }
   }
+
+  async function googleSignIn() {
+    setBusy(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      const result = await signInWithPopup(firebaseAuth, provider);
+      const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
+
+      if (isNewUser) {
+        // Google is sign-in only: brand new people must register with email first.
+        try {
+          await deleteUser(result.user);
+        } catch {
+          await signOut(firebaseAuth);
+        }
+        toast.error("No Candid account found. Create one with your email first, then use Google.");
+        setMode("signup");
+        return;
+      }
+
+      toast.success("Signed in. You are anonymous to everyone else.");
+      navigate({ to: "/" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Google sign-in failed";
+      if (!message.includes("popup-closed-by-user") && !message.includes("cancelled-popup")) {
+        toast.error(message);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+
 
   return (
     <div className="mx-auto max-w-md animate-rise">
@@ -103,6 +146,45 @@ function AuthPage() {
             {mode === "signin" ? "Sign in" : "Create account"}
           </Button>
         </form>
+
+        <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-widest text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          or
+          <span className="h-px flex-1 bg-border" />
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          disabled={busy}
+          onClick={googleSignIn}
+          className="w-full"
+        >
+          <svg className="size-4" viewBox="0 0 24 24" aria-hidden>
+            <path
+              fill="#4285F4"
+              d="M21.6 12.23c0-.75-.07-1.47-.2-2.16H12v4.09h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.23c1.89-1.74 2.99-4.3 2.99-7.45Z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 22c2.7 0 4.96-.9 6.61-2.42l-3.23-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.07v2.59A10 10 0 0 0 12 22Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M6.41 13.92a6 6 0 0 1 0-3.83V7.5H3.07a10 10 0 0 0 0 9l3.34-2.58Z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.98c1.47 0 2.79.5 3.83 1.5l2.87-2.87C16.95 2.99 14.7 2 12 2a10 10 0 0 0-8.93 5.5l3.34 2.59C7.2 7.73 9.4 5.98 12 5.98Z"
+            />
+          </svg>
+          Continue with Google
+        </Button>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Google works only for existing accounts. New here? Sign up with email first.
+        </p>
+
+
 
         <button
           type="button"

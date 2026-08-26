@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Activity, Flame, MapPin, PenLine, ShieldCheck, TrendingUp } from "lucide-react";
 import { getFilterOptions, listStories } from "@/lib/public.functions";
 import { StoryCard } from "@/components/site/story-card";
+import { PulseLoader } from "@/components/site/route-progress";
+
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -125,10 +127,12 @@ function FeedPage() {
 
           {isPending ? (
             <div className="space-y-4">
+              <PulseLoader label="Loading stories" />
               {[0, 1, 2].map((i) => (
                 <Skeleton key={i} className="h-44 w-full rounded-2xl" />
               ))}
             </div>
+
           ) : (data?.stories.length ?? 0) === 0 ? (
             <p className="rounded-2xl border border-border p-8 text-center text-sm text-muted-foreground">
               No stories match these filters yet.
@@ -179,11 +183,12 @@ function FeedPage() {
 function SignalPanel() {
   return (
     <div
-      className="signal-panel relative mx-auto w-full max-w-md"
+      className="signal-panel dark relative mx-auto w-full max-w-md"
       aria-label="Candid workplace signals"
     >
       <div className="signal-grid absolute inset-0 rounded-3xl" />
-      <div className="relative min-h-72 overflow-hidden rounded-3xl border border-white/10 bg-black/20 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm">
+      <div className="relative min-h-72 overflow-hidden rounded-3xl border border-white/10 bg-[oklch(0.135_0.014_285)] p-5 text-foreground shadow-2xl shadow-black/30 backdrop-blur-sm">
+
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="flex items-center gap-2 font-medium text-foreground">
             <Activity className="size-4 text-primary" /> Candid pulse
