@@ -55,7 +55,7 @@ export function getFirebaseAdminApp() {
   if (!firebaseAdminApp) {
     const existing = getApps();
     if (existing.length > 0) {
-      firebaseAdminApp = existing[0];
+      firebaseAdminApp = existing[0]!;
     } else {
       const serviceAccount = parseServiceAccount();
       firebaseAdminApp = initializeApp({
