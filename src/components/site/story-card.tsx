@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowBigUp, MapPin, MessageSquare, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -25,9 +25,23 @@ export function reasonTone(reason: string) {
 }
 
 export function StoryCard({ story, index = 0 }: { story: PublicStory; index?: number }) {
+  const navigate = useNavigate();
+  const open = () => {
+    if (story.id) void navigate({ to: "/stories/$id", params: { id: story.id } });
+  };
+
   return (
     <article
-      className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5"
+      role={story.id ? "link" : undefined}
+      tabIndex={story.id ? 0 : undefined}
+      onClick={open}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          open();
+        }
+      }}
+      className="animate-rise cursor-pointer rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
     >
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -35,7 +49,8 @@ export function StoryCard({ story, index = 0 }: { story: PublicStory; index?: nu
           <Link
             to="/companies/$slug"
             params={{ slug: story.company_slug }}
-            className="font-semibold text-foreground hover:text-primary"
+            onClick={(event) => event.stopPropagation()}
+            className="relative z-10 font-semibold text-foreground hover:text-primary"
           >
             {story.company_name}
           </Link>
@@ -53,13 +68,7 @@ export function StoryCard({ story, index = 0 }: { story: PublicStory; index?: nu
       </div>
 
       <h3 className="mt-2 text-lg font-semibold leading-snug">
-        {story.id ? (
-          <Link to="/stories/$id" params={{ id: story.id }} className="hover:text-primary">
-            {story.title}
-          </Link>
-        ) : (
-          story.title
-        )}
+        {story.title}
       </h3>
 
       <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{story.body}</p>
