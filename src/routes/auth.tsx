@@ -64,6 +64,40 @@ function AuthPage() {
     }
   }
 
+  async function googleSignIn() {
+    setBusy(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      const result = await signInWithPopup(firebaseAuth, provider);
+      const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
+
+      if (isNewUser) {
+        // Google is sign-in only: brand new people must register with email first.
+        try {
+          await deleteUser(result.user);
+        } catch {
+          await signOut(firebaseAuth);
+        }
+        toast.error("No Candid account found. Create one with your email first, then use Google.");
+        setMode("signup");
+        return;
+      }
+
+      toast.success("Signed in. You are anonymous to everyone else.");
+      navigate({ to: "/" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Google sign-in failed";
+      if (!message.includes("popup-closed-by-user") && !message.includes("cancelled-popup")) {
+        toast.error(message);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+
+
   return (
     <div className="mx-auto max-w-md animate-rise">
       <div className="glass-card rounded-2xl border border-border p-6">
