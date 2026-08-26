@@ -2,8 +2,11 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Building2, Flame, Home, LogOut, PenLine, Search, Trophy, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/site/theme-toggle";
+import { SplashScreen } from "@/components/site/splash-screen";
+import { RouteProgress } from "@/components/site/route-progress";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+
 
 const nav = [
   { to: "/", label: "Feed", icon: Home },
@@ -19,7 +22,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
+      <SplashScreen />
+      <RouteProgress />
       <header className="sticky top-0 z-40 border-b border-border glass-card">
+
         <div className="app-shell flex h-16 items-center gap-3">
           <Link to="/" className="flex items-center gap-2">
             <Flame className="size-5 text-primary" />
