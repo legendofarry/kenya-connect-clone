@@ -6,6 +6,7 @@ import { StoryCard } from "@/components/site/story-card";
 import { ScoreBadge } from "@/routes/companies.index";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { BackButton } from "@/components/site/back-button";
 
 const companyQuery = (slug: string) =>
   queryOptions({
@@ -57,6 +58,7 @@ function CompanyPage() {
 
   return (
     <div className="space-y-8">
+      <BackButton fallback="/companies" />
       <section className="mesh-hero animate-fade rounded-3xl border border-border p-6 md:p-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Bell, Building2, Flame, Home, LogOut, PenLine, Search, Trophy, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,16 @@ import { RouteProgress } from "@/components/site/route-progress";
 import { NotificationBanners } from "@/components/site/notification-banners";
 import { useUnreadCount } from "@/lib/notifications-store";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 
@@ -22,6 +33,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const unread = useUnreadCount();
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,7 +86,12 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               </Link>
             </Button>
             {user ? (
-              <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => signOut()}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Sign out"
+                onClick={() => setConfirmSignOut(true)}
+              >
                 <LogOut className="size-4" />
               </Button>
             ) : (
@@ -130,6 +147,28 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           })}
         </div>
       </nav>
+
+      <AlertDialog open={confirmSignOut} onOpenChange={setConfirmSignOut}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign out of Candid?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will need to sign in again to post stories, comment or vote.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Stay signed in</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setConfirmSignOut(false);
+                void signOut();
+              }}
+            >
+              Sign out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
