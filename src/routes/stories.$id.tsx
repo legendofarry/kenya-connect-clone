@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { BackButton } from "@/components/site/back-button";
 
 const storyQuery = (id: string) =>
   queryOptions({ queryKey: ["story", id], queryFn: () => getStory({ data: { id } }) });
@@ -73,6 +74,7 @@ function StoryPage() {
 
   return (
     <article className="mx-auto max-w-3xl space-y-6">
+      <BackButton fallback="/" />
       <div className="animate-fade">
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {story.company_slug ? (
