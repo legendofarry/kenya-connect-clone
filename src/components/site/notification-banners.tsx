@@ -81,7 +81,7 @@ function Banner({ banner }: { banner: BannerNotification }) {
         </button>
       </div>
       <span
-        className={cn("absolute inset-x-0 bottom-0 h-0.5 origin-left", style.ring, "before:hidden bg-current opacity-30", style.accent)}
+        className={cn("absolute inset-x-0 bottom-0 h-0.5 origin-left bg-current opacity-40", style.accent)}
         style={{ animation: `banner-progress ${banner.duration}ms linear forwards` }}
       />
     </div>
