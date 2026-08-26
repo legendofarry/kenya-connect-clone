@@ -1,24 +1,259 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Activity, Flame, MapPin, PenLine, ShieldCheck, TrendingUp } from "lucide-react";
+import { getFilterOptions, listStories } from "@/lib/public.functions";
+import { StoryCard } from "@/components/site/story-card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
-  component: Index,
+const feedQuery = queryOptions({
+  queryKey: ["stories", "new"],
+  queryFn: () => listStories({ data: { sort: "new" } }),
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const filtersQuery = queryOptions({
+  queryKey: ["filters"],
+  queryFn: () => getFilterOptions(),
+});
+
+export const Route = createFileRoute("/")({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(feedQuery),
+      context.queryClient.ensureQueryData(filtersQuery),
+    ]);
+  },
+  head: () => ({
+    meta: [
+      { title: "Candid — anonymous exit stories from Kenyan workplaces" },
+      {
+        name: "description",
+        content:
+          "Read anonymous exit stories from Kenyan employees and research employers before you accept an offer. Pay, contracts, respect and workload — told by the people who left.",
+      },
+      { property: "og:title", content: "Candid — anonymous workplace exit stories" },
+      {
+        property: "og:description",
+        content: "Why Kenyans really left their jobs. Anonymous, searchable, employer by employer.",
+      },
+    ],
+  }),
+  component: FeedPage,
+});
+
+const SORTS = [
+  { key: "new", label: "Newest" },
+  { key: "top", label: "Most upvoted" },
+  { key: "trending", label: "Trending this week" },
+] as const;
+
+function FeedPage() {
+  const { data: filters } = useSuspenseQuery(filtersQuery);
+  const [sort, setSort] = useState<"new" | "top" | "trending">("new");
+  const [industry, setIndustry] = useState<string | null>(null);
+  const [county, setCounty] = useState<string | null>(null);
+
+  const { data, isPending } = useQuery({
+    queryKey: ["stories", sort, industry, county],
+    queryFn: () => listStories({ data: { sort, industry, county } }),
+  });
+
+  return (
+    <div className="space-y-8">
+      <section className="mesh-hero animate-fade relative overflow-hidden rounded-3xl border border-border p-6 md:p-12">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] lg:gap-12">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
+              <ShieldCheck className="size-3.5 text-verified" /> Anonymous by design · Kenya
+            </p>
+            <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.05] md:text-6xl">
+              The <span className="text-gradient">real reasons</span> Kenyans left their jobs.
+            </h1>
+            <p className="mt-4 max-w-2xl text-muted-foreground md:text-lg">
+              Exit stories, red-flag scores and salary honesty for employers across Nairobi,
+              Mombasa, Kisumu and beyond. Research a company before you sign — or tell the story
+              nobody let you tell at your exit interview.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="glow-primary">
+                <Link to="/post">
+                  <PenLine className="size-4" /> Share your exit story
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/companies">Browse companies</Link>
+              </Button>
+            </div>
+          </div>
+          <SignalPanel />
+        </div>
+      </section>
+
+      <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)_240px] xl:grid-cols-[minmax(220px,280px)_minmax(0,1fr)_minmax(240px,320px)] 2xl:grid-cols-[280px_minmax(640px,1fr)_320px]">
+        <aside className="space-y-5 lg:sticky lg:top-20 lg:self-start">
+          <FilterGroup
+            title="Industry"
+            options={filters.industries}
+            value={industry}
+            onChange={setIndustry}
+          />
+          <FilterGroup
+            title="County"
+            options={filters.counties}
+            value={county}
+            onChange={setCounty}
+          />
+        </aside>
+
+        <div className="min-w-0 space-y-4">
+          <div className="flex flex-wrap gap-2">
+            {SORTS.map((option) => (
+              <button
+                key={option.key}
+                onClick={() => setSort(option.key)}
+                className={cn(
+                  "rounded-full border border-border px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+                  sort === option.key && "border-primary/50 bg-primary/10 text-foreground",
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          {isPending ? (
+            <div className="space-y-4">
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} className="h-44 w-full rounded-2xl" />
+              ))}
+            </div>
+          ) : (data?.stories.length ?? 0) === 0 ? (
+            <p className="rounded-2xl border border-border p-8 text-center text-sm text-muted-foreground">
+              No stories match these filters yet.
+            </p>
+          ) : (
+            data?.stories.map((story, index) => (
+              <StoryCard key={story.id} story={story} index={index} />
+            ))
+          )}
+        </div>
+
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <TrendingUp className="size-4 text-primary" /> Most discussed
+            </h2>
+            <ul className="mt-3 space-y-2 text-sm">
+              {filters.companies.slice(0, 6).map((company) => (
+                <li key={company.slug}>
+                  <Link
+                    to="/companies/$slug"
+                    params={{ slug: company.slug }}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    {company.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-2xl border border-danger/30 bg-danger/5 p-4 text-sm">
+            <h2 className="flex items-center gap-2 font-semibold">
+              <Flame className="size-4 text-danger" /> Know your rights
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Unpaid salary, no contract or forced overtime? See what Kenyan labour law says.
+            </p>
+            <Link to="/rights" className="mt-2 inline-block font-medium text-danger">
+              Read the basics →
+            </Link>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function SignalPanel() {
   return (
     <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
+      className="signal-panel relative mx-auto w-full max-w-md"
+      aria-label="Candid workplace signals"
     >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+      <div className="signal-grid absolute inset-0 rounded-3xl" />
+      <div className="relative min-h-72 overflow-hidden rounded-3xl border border-white/10 bg-black/20 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-foreground">
+            <Activity className="size-4 text-primary" /> Candid pulse
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-1.5 animate-pulse rounded-full bg-primary" /> Anonymous signals
+          </span>
+        </div>
+
+        <div className="signal-orbit absolute left-1/2 top-[52%] size-44 -translate-x-1/2 -translate-y-1/2">
+          <span className="signal-ring signal-ring-one" />
+          <span className="signal-ring signal-ring-two" />
+          <span className="signal-ring signal-ring-three" />
+          <div className="signal-core">
+            <span className="text-2xl font-semibold text-foreground">LIVE</span>
+            <span className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              stories
+            </span>
+          </div>
+          <span className="signal-dot signal-dot-one" />
+          <span className="signal-dot signal-dot-two" />
+          <span className="signal-dot signal-dot-three" />
+        </div>
+
+        <span className="signal-tag signal-tag-pay">PAY</span>
+        <span className="signal-tag signal-tag-culture">CULTURE</span>
+        <span className="signal-tag signal-tag-workload">WORKLOAD</span>
+        <span className="signal-tag signal-tag-respect">RESPECT</span>
+
+        <div className="absolute inset-x-5 bottom-5 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs">
+          <span className="flex items-center gap-1.5 text-muted-foreground">
+            <MapPin className="size-3.5 text-verified" /> Nairobi · Kenya
+          </span>
+          <span className="text-primary">Signal detected</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FilterGroup({
+  title,
+  options,
+  value,
+  onChange,
+}: {
+  title: string;
+  options: string[];
+  value: string | null;
+  onChange: (next: string | null) => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h2>
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={() => onChange(value === option ? null : option)}
+            className={cn(
+              "rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground",
+              value === option && "border-primary/50 bg-primary/10 text-foreground",
+            )}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
