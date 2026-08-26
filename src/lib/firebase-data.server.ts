@@ -164,7 +164,7 @@ export async function readCollection<T extends DocumentData>(name: string) {
 export async function readDocument<T extends DocumentData>(name: string, id: string) {
   const db = getFirestoreDb();
   const snapshot = await db.collection(name).doc(id).get();
-  if (!snapshot.exists()) return null;
+  if (!snapshot.exists) return null;
   return { id: snapshot.id, ...(snapshot.data() as T) };
 }
 
@@ -192,8 +192,8 @@ function median(values: number[]) {
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 1) return sorted[middle];
-  return (sorted[middle - 1] + sorted[middle]) / 2;
+  if (sorted.length % 2 === 1) return sorted[middle] ?? null;
+  return ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2;
 }
 
 export async function buildCompanyScores() {
@@ -300,7 +300,7 @@ export async function buildSalaryAggregates() {
       high_kes: Math.max(...highs),
       industry: items[0]?.industry ?? null,
       low_kes: Math.min(...lows),
-      mid_kes: median(mids),
+      mid_kes: median(mids) ?? null,
       reports: items.length,
       role_title: items[0]?.role_title ?? null,
     });

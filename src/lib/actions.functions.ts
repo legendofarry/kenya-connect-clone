@@ -233,7 +233,7 @@ export const addComment = createServerFn({ method: "POST" })
         status: "published",
         created_at: new Date().toISOString(),
       });
-    await storyRef.update({ comment_count: Number(currentStory?.comment_count ?? 0) + 1 });
+    await storyRef.update({ comment_count: Number(currentStory?.['comment_count'] ?? 0) + 1 });
     return { ok: true };
   });
 
