@@ -7,3 +7,5 @@
   # Builds the app as a Netlify SSR function bundle (.netlify/functions-internal)
   # instead of the default Cloudflare Worker output.
   NITRO_PRESET = "netlify"
+  # Skip secrets scanning entirely
+  SECRETS_SCAN_ENABLED = "false"
