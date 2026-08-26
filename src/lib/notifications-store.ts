@@ -6,7 +6,7 @@ export type AppNotification = {
   id: string;
   kind: NotifyKind;
   title: string;
-  description?: string;
+  description?: string | undefined;
   createdAt: number;
   read: boolean;
 };
