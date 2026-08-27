@@ -13,10 +13,10 @@ export interface StoredCredential {
 const CREDENTIALS_KEY = "candid_webauthn_credentials";
 const SESSION_UNLOCKED_KEY = "candid_biometric_unlocked";
 
-function fromBase64Url(value: string): Uint8Array {
+function fromBase64Url(value: string): Uint8Array<ArrayBuffer> {
   const padded = value.replace(/-/g, "+").replace(/_/g, "/");
   const raw = atob(padded + "=".repeat((4 - (padded.length % 4)) % 4));
-  const bytes = new Uint8Array(raw.length);
+  const bytes = new Uint8Array(new ArrayBuffer(raw.length));
   for (let i = 0; i < raw.length; i += 1) bytes[i] = raw.charCodeAt(i);
   return bytes;
 }
@@ -31,7 +31,7 @@ function toBase64Url(buffer: ArrayBuffer): string {
 }
 
 function randomChallenge() {
-  const bytes = new Uint8Array(32);
+  const bytes = new Uint8Array(new ArrayBuffer(32));
   crypto.getRandomValues(bytes);
   return bytes;
 }
@@ -83,7 +83,7 @@ export async function registerBiometric(
       challenge: randomChallenge(),
       rp: { name: "Candid", id: window.location.hostname },
       user: {
-        id: new TextEncoder().encode(userId),
+        id: fromBase64Url(btoa(userId).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")),
         name: userName,
         displayName: userName,
       },
