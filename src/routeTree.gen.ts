@@ -17,6 +17,7 @@ import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RightsRouteImport } from './routes/rights'
 import { Route as SalariesRouteImport } from './routes/salaries'
 import { Route as SearchRouteImport } from './routes/search'
@@ -67,6 +68,11 @@ const PostRoute = PostRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RightsRoute = RightsRouteImport.update({
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/rights': typeof RightsRoute
   '/salaries': typeof SalariesRoute
   '/search': typeof SearchRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/rights': typeof RightsRoute
   '/salaries': typeof SalariesRoute
   '/search': typeof SearchRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/rights': typeof RightsRoute
   '/salaries': typeof SalariesRoute
   '/search': typeof SearchRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/post'
     | '/privacy'
+    | '/profile'
     | '/rights'
     | '/salaries'
     | '/search'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/post'
     | '/privacy'
+    | '/profile'
     | '/rights'
     | '/salaries'
     | '/search'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/post'
     | '/privacy'
+    | '/profile'
     | '/rights'
     | '/salaries'
     | '/search'
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   PostRoute: typeof PostRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   RightsRoute: typeof RightsRoute
   SalariesRoute: typeof SalariesRoute
   SearchRoute: typeof SearchRoute
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rights': {
@@ -424,6 +444,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   PostRoute: PostRoute,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   RightsRoute: RightsRoute,
   SalariesRoute: SalariesRoute,
   SearchRoute: SearchRoute,
