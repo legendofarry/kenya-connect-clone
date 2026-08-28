@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   deleteUser,
@@ -10,7 +10,12 @@ import {
   signOut,
 } from "firebase/auth";
 import { notify as toast } from "@/lib/notifications-store";
-import { EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { EyeOff, Fingerprint, Loader2, ShieldCheck } from "lucide-react";
+import {
+  authenticateWithBiometric,
+  getCredentials,
+  markUnlocked,
+} from "@/lib/biometrics";
 import { firebaseAuth } from "@/integrations/firebase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +49,24 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [hasBiometric, setHasBiometric] = useState(false);
+
+  useEffect(() => {
+    setHasBiometric(getCredentials().length > 0);
+  }, []);
+
+  async function biometricUnlock() {
+    setBusy(true);
+    const ok = await authenticateWithBiometric();
+    setBusy(false);
+    if (ok) {
+      markUnlocked();
+      toast.success("Welcome back.");
+      navigate({ to: "/" });
+    } else {
+      toast.error("Scan not recognised. Use your email and password.");
+    }
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -152,6 +175,19 @@ function AuthPage() {
           or
           <span className="h-px flex-1 bg-border" />
         </div>
+
+        {hasBiometric ? (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={biometricUnlock}
+            className="mb-3 w-full"
+          >
+            <Fingerprint className="size-4" />
+            Use fingerprint or face
+          </Button>
+        ) : null}
 
         <Button
           type="button"
