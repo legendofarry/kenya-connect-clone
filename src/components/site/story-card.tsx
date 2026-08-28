@@ -90,17 +90,17 @@ export function StoryCard({ story, index = 0 }: { story: PublicStory; index?: nu
       </div>
 
       <div className="mt-4 flex items-center gap-5 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1">
-          <ArrowBigUp className="size-4 text-primary" /> {story.upvotes ?? 0}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <Users className="size-4" /> {story.metoo ?? 0} me too
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <MessageSquare className="size-4" /> {story.comment_count ?? 0}
-        </span>
         <span className="ml-auto">Anonymous · {formatDate(story.created_at)}</span>
       </div>
+
+      {story.id ? (
+        <StoryActions
+          storyId={story.id}
+          upvotes={story.upvotes ?? 0}
+          metoo={story.metoo ?? 0}
+          commentCount={story.comment_count ?? 0}
+        />
+      ) : null}
     </article>
   );
 }
