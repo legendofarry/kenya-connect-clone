@@ -1,6 +1,18 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, Building2, Flame, Home, LogOut, PenLine, Search, Trophy, Wallet } from "lucide-react";
+import {
+  Bell,
+  Building2,
+  Flame,
+  Home,
+  LogOut,
+  PenLine,
+  Search,
+  Trophy,
+  UserRound,
+  Wallet,
+} from "lucide-react";
+import { BiometricGate } from "@/components/site/biometric-gate";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { SplashScreen } from "@/components/site/splash-screen";
@@ -27,6 +39,7 @@ const nav = [
   { to: "/leaderboards", label: "Leaderboards", icon: Trophy },
   { to: "/salaries", label: "Salaries", icon: Wallet },
   { to: "/search", label: "Search", icon: Search },
+  { to: "/profile", label: "Profile", icon: UserRound },
 ] as const;
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -79,6 +92,16 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                 </span>
               ) : null}
             </Link>
+            <Link
+              to="/profile"
+              aria-label="Profile and settings"
+              className={cn(
+                "inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+                pathname === "/profile" && "bg-secondary text-foreground",
+              )}
+            >
+              <UserRound className="size-4" />
+            </Link>
             <ThemeToggle />
             <Button asChild size="sm" className="glow-primary">
               <Link to="/post">
@@ -103,7 +126,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="app-shell pb-28 pt-6 md:pb-16">{children}</main>
+      <main className="app-shell pb-28 pt-6 md:pb-16">
+        <BiometricGate>{children}</BiometricGate>
+      </main>
 
       <footer className="border-t border-border py-10 text-sm text-muted-foreground">
         <div className="app-shell flex flex-wrap gap-x-6 gap-y-2">
@@ -127,7 +152,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       </footer>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border glass-card md:hidden">
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {nav.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.to;
