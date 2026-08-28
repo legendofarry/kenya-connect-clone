@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowBigUp, MapPin, MessageSquare, Users } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { StoryActions } from "@/components/site/story-actions";
 
 export type PublicStory = {
   id: string | null;
