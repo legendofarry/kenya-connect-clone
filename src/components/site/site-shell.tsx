@@ -1,6 +1,18 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, Building2, Flame, Home, LogOut, PenLine, Search, Trophy, Wallet } from "lucide-react";
+import {
+  Bell,
+  Building2,
+  Flame,
+  Home,
+  LogOut,
+  PenLine,
+  Search,
+  Trophy,
+  UserRound,
+  Wallet,
+} from "lucide-react";
+import { BiometricGate } from "@/components/site/biometric-gate";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { SplashScreen } from "@/components/site/splash-screen";
